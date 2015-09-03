@@ -17,6 +17,7 @@ ark "phpmyadmin" do
   path "/srv/default"
   checksum  node[:lw1_agenti][:bonus][:phpmyadmin][:checksum]
   owner 'www-data'
+  group 'www-data'
   action :put
 end
 

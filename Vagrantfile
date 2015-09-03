@@ -49,7 +49,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.provision :shell, :path => "bootstrap.sh"
   config.vm.provision :chef_solo do |chef|
     chef.cookbooks_path = ["cookbooks", "site-cookbooks"]
-    chef.role_path      = "roles"
+    chef.roles_path      = "roles"
     chef.add_recipe "role[provision-ubuntu]"
   end
 
