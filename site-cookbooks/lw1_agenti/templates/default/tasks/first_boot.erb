@@ -1,0 +1,67 @@
+require 'unix_crypt'
+require 'json'
+
+ruby_block "set instance_id to password by default" do
+  block do
+    salt = rand(36**16).to_s(36)
+    shadow = UnixCrypt::SHA512.build(node[:ec2][:instance_id], salt, 40000)
+    config = JSON.load(File.read('/etc/ajenti/config.json'))
+    config['users']['root']['password'] = ["sha512", shadow].join("|")
+    config['bind']['port'] = 8443
+    File.open('/etc/ajenti/config.json', "w") { |f| f.puts(JSON.pretty_generate(config)) }
+  end
+end
+
+bash "generate tls cert" do
+  code <<-"EOL"
+    /usr/bin/ajenti-ssl-gen #{node[:ec2][:public_ipv4] ? node[:ec2][:public_ipv4] : node[:ec2][:hostname]} -f
+  EOL
+end
+
+bash 'mysql_secure_install emulate' do
+  code <<-"EOH"
+    /usr/bin/mysqladmin drop test -f
+    /usr/bin/mysql -e "DELETE FROM user WHERE user = '';" -D mysql
+    /usr/bin/mysql -e "DELETE FROM mysql.user WHERE User='root' AND Host NOT IN ('localhost', '127.0.0.1', '::1');" -D mysql
+    /usr/bin/mysql -e "SET PASSWORD FOR 'root'@'::1' = PASSWORD('#{node.ec2.instance_id}');" -D mysql
+    /usr/bin/mysql -e "SET PASSWORD FOR 'root'@'127.0.0.1' = PASSWORD('#{node.ec2.instance_id}');" -D mysql
+    /usr/bin/mysql -e "SET PASSWORD FOR 'root'@'localhost' = PASSWORD('#{node.ec2.instance_id}');" -D mysql
+    /usr/bin/mysqladmin flush-privileges -pnewpassword -p#{node.ec2.instance_id}
+  EOH
+  action :run
+  only_if "/usr/bin/mysql -u root -e 'show databases;'"
+end
+
+bash 'create_cert_for_ssl' do
+  code <<-EOH
+  openssl genrsa > /etc/ajenti/certs/default_key.pem
+  openssl req -subj "/C=JP/ST=Kobe-shi/L=Chuo-ku/O=OpsRock LLC/OU=amiage.com/CN=#{node[:ec2][:public_ipv4] ? node[:ec2][:public_ipv4] : node[:ipaddress]}" \
+    -new -x509 -nodes -sha1 -days 3650 -key /etc/ajenti/certs/default_key.pem > /etc/ajenti/certs/default_cert.pem
+  EOH
+  creates '/etc/ajenti/certs/default_cert.pem'
+end
+
+file '/etc/ajenti/certs/default_key.pem' do
+  mode '0600'
+end
+
+file '/etc/ajenti/certs/default_cert.pem' do
+  mode '0644'
+end
+
+template "/etc/ajenti/vh.json" do
+  local true
+  source "/opt/lw1/tasks/vh.json.erb"
+end
+
+service "ajenti" do
+  action [:start, :enable]
+end
+
+service "nginx" do
+  action :restart
+end
+
+cron "setup_ajenti_on_init" do
+  action :delete
+end

@@ -1,0 +1,21 @@
+SITE
+  remote: http://community.opscode.com/api/v1
+  specs:
+    7-zip (1.0.2)
+      windows (>= 1.2.2)
+    apt (2.8.2)
+    ark (0.9.0)
+      7-zip (>= 0.0.0)
+      windows (>= 0.0.0)
+    build-essential (2.2.3)
+    chef_handler (1.2.0)
+    simplelog_handler (1.0.0)
+    windows (1.38.1)
+      chef_handler (>= 0.0.0)
+
+DEPENDENCIES
+  apt (>= 0)
+  ark (>= 0)
+  build-essential (>= 0)
+  simplelog_handler (>= 0)
+

@@ -1,0 +1,9 @@
+{
+  "name": "provision-ubuntu",
+  "run_list": [
+    "recipe[simplelog_handler::default]",
+    "recipe[apt::default]",
+    "recipe[build-essential::default]",
+    "recipe[lw1_agenti::default]"
+  ]
+}
