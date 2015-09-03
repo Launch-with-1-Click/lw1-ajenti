@@ -37,20 +37,20 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     end
 
     aws.tags = {
-      'Name' => 'Ajenti 1.x + Agenti-V (Develop)'
+      'Name' => 'Ajenti 1.x and Agenti-V (Develop)'
     }
     override.ssh.username = "ubuntu"
     override.ssh.private_key_path = ENV['AWS_EC2_KEYPASS']
   end
 
-  config.ssh.pty = true
+  # config.ssh.pty = true
 
   ## Sction Provisioning
   config.vm.provision :shell, :path => "bootstrap.sh"
   config.vm.provision :chef_solo do |chef|
     chef.cookbooks_path = ["cookbooks", "site-cookbooks"]
     chef.roles_path      = "roles"
-    chef.add_recipe "role[provision-ubuntu]"
+    chef.add_role "role[provision-ubuntu]"
   end
 
 end
