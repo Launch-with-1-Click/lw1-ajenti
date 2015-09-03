@@ -27,9 +27,37 @@ bash 'mysql_secure_install emulate' do
     /usr/bin/mysql -e "SET PASSWORD FOR 'root'@'127.0.0.1' = PASSWORD('#{node.ec2.instance_id}');" -D mysql
     /usr/bin/mysql -e "SET PASSWORD FOR 'root'@'localhost' = PASSWORD('#{node.ec2.instance_id}');" -D mysql
     /usr/bin/mysqladmin flush-privileges -pnewpassword -p#{node.ec2.instance_id}
+    /usr/bin/mysql -uroot -p#{node.ec2.instance_id} -D mysql < /srv/default/phpmyadmin/sql/create_tables.sql
   EOH
   action :run
   only_if "/usr/bin/mysql -u root -e 'show databases;'"
+end
+
+bash 'phpmyadmin setup' do
+  code <<-'EOH'
+    cp -p /srv/default/phpmyadmin/config.sample.inc.php /srv/default/phpmyadmin/config.inc.php
+    sed -e "s@\$cfg\['blowfish_secret'\]\ =\ '';@\$cfg\['blowfish_secret'\]\ =\ '`openssl rand -hex 46`';@" /srv/default/phpmyadmin/config.inc.php -i
+    sed -e "s@^//\ \(\$cfg\['Servers'\]\[\$i\]\['pmadb'\]\)@\1@" /srv/default/phpmyadmin/config.inc.php -i
+    sed -e "s@^//\ \(\$cfg\['Servers'\]\[\$i\]\['bookmarktable'\]\)@\1@" /srv/default/phpmyadmin/config.inc.php -i
+    sed -e "s@^//\ \(\$cfg\['Servers'\]\[\$i\]\['relation'\]\)@\1@" /srv/default/phpmyadmin/config.inc.php -i
+    sed -e "s@^//\ \(\$cfg\['Servers'\]\[\$i\]\['table_info'\]\)@\1@" /srv/default/phpmyadmin/config.inc.php -i
+    sed -e "s@^//\ \(\$cfg\['Servers'\]\[\$i\]\['table_coords'\]\)@\1@" /srv/default/phpmyadmin/config.inc.php -i
+    sed -e "s@^//\ \(\$cfg\['Servers'\]\[\$i\]\['pdf_pages'\]\)@\1@" /srv/default/phpmyadmin/config.inc.php -i
+    sed -e "s@^//\ \(\$cfg\['Servers'\]\[\$i\]\['column_info'\]\)@\1@" /srv/default/phpmyadmin/config.inc.php -i
+    sed -e "s@^//\ \(\$cfg\['Servers'\]\[\$i\]\['history'\]\)@\1@" /srv/default/phpmyadmin/config.inc.php -i
+    sed -e "s@^//\ \(\$cfg\['Servers'\]\[\$i\]\['table_uiprefs'\]\)@\1@" /srv/default/phpmyadmin/config.inc.php -i
+    sed -e "s@^//\ \(\$cfg\['Servers'\]\[\$i\]\['tracking'\]\)@\1@" /srv/default/phpmyadmin/config.inc.php -i
+    sed -e "s@^//\ \(\$cfg\['Servers'\]\[\$i\]\['userconfig'\]\)@\1@" /srv/default/phpmyadmin/config.inc.php -i
+    sed -e "s@^//\ \(\$cfg\['Servers'\]\[\$i\]\['recent'\]\)@\1@" /srv/default/phpmyadmin/config.inc.php -i
+    sed -e "s@^//\ \(\$cfg\['Servers'\]\[\$i\]\['favorite'\]\)@\1@" /srv/default/phpmyadmin/config.inc.php -i
+    sed -e "s@^//\ \(\$cfg\['Servers'\]\[\$i\]\['users'\]\)@\1@" /srv/default/phpmyadmin/config.inc.php -i
+    sed -e "s@^//\ \(\$cfg\['Servers'\]\[\$i\]\['usergroups'\]\)@\1@" /srv/default/phpmyadmin/config.inc.php -i
+    sed -e "s@^//\ \(\$cfg\['Servers'\]\[\$i\]\['navigationhiding'\]\)@\1@" /srv/default/phpmyadmin/config.inc.php -i
+    sed -e "s@^//\ \(\$cfg\['Servers'\]\[\$i\]\['savedsearches'\]\)@\1@" /srv/default/phpmyadmin/config.inc.php -i
+    sed -e "s@^//\ \(\$cfg\['Servers'\]\[\$i\]\['central_columns'\]\)@\1@" /srv/default/phpmyadmin/config.inc.php -i
+  EOH
+  action :run
+  not_if "test -f /srv/default/phpmyadmin/config.inc.php"
 end
 
 bash 'create_cert_for_ssl' do
@@ -64,4 +92,11 @@ end
 
 cron "setup_ajenti_on_init" do
   action :delete
+end
+
+%w{/var/chef/cache /var/chef/backup}.map do |dir|
+  directory dir do
+    action :delete
+    recursive true
+  end
 end

@@ -5,6 +5,7 @@ set -ex
 sudo apt-get clean all
 
 sudo rm -rf /tmp/*
+sudo rm -rf /var/chef
 sudo rm -rf /vagrant
 sudo rm -f /etc/ssh/ssh_host_*
 cd /var/log
