@@ -49,10 +49,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.provision :shell, :path => "bootstrap.sh"
   config.vm.provision :chef_solo do |chef|
     chef.cookbooks_path = ["cookbooks", "site-cookbooks"]
-    p_role = JSON.parse(File.read(File.expand_path('../roles/provision-ubuntu.json',__FILE__)))
-    p_role["run_list"].map do |r|
-      chef.add_recipe r
-    end
+    chef.role_path      = "roles"
+    chef.add_recipe "role[provision-ubuntu]"
   end
 
 end

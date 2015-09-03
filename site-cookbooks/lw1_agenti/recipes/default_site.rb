@@ -5,7 +5,7 @@ directory "/srv/default" do
   mode  "0755"
 end
 
-execut "cp -p /usr/share/nginx/html/* /srv/default/" do
+execute "cp -p /usr/share/nginx/html/* /srv/default/" do
   action :nothing
   subscribes :run, "directory[/srv/default]"
 end
