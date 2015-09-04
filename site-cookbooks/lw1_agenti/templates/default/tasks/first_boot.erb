@@ -8,6 +8,7 @@ ruby_block "set instance_id to password by default" do
     config = JSON.load(File.read('/etc/ajenti/config.json'))
     config['users']['root']['password'] = ["sha512", shadow].join("|")
     config['bind']['port'] = 8443
+    config.delete('installation_id')
     File.open('/etc/ajenti/config.json', "w") { |f| f.puts(JSON.pretty_generate(config)) }
   end
 end
@@ -77,13 +78,28 @@ file '/etc/ajenti/certs/default_cert.pem' do
   mode '0644'
 end
 
-template "/etc/ajenti/vh.json" do
+template "/opt/lw1/tasks/site_phpmyadmin.json" do
   local true
-  source "/opt/lw1/tasks/vh.json.erb"
+  source "/opt/lw1/tasks/site_phpmyadmin.json.erb"
+end
+
+file '/etc/ajenti/vh.json' do
+  owner "root"
+  group "root"
+  mode  "0666"
+  action :create
+  content JSON.pretty_generate({websites: []})
 end
 
 service "ajenti" do
   action [:start, :enable]
+end
+
+bash "import phpadmin to website" do
+  code <<-EOH
+    /usr/bin/ajenti-ipc v import /opt/lw1/tasks/site_phpmyadmin.json
+    /usr/bin/ajenti-ipc v apply
+  EOH
 end
 
 service "nginx" do

@@ -21,6 +21,14 @@ file "/etc/ajenti/ajenti.pem" do
   action :delete
 end
 
+file "/etc/ajenti/.ssl-generated" do
+  action :delete
+end
+
+file "/var/lib/ajenti/installation-uid" do
+  action :delete
+end
+
 cron "setup_ajenti_on_init" do
   action :create
   time :reboot

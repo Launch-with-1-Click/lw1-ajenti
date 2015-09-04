@@ -1,0 +1,55 @@
+{
+  "maintenance_mode": true,
+  "locations": [
+    {
+      "custom_conf_override": false,
+      "path_append_pattern": false,
+      "pattern": "[^/]\\.php(/|$)",
+      "custom_conf": "",
+      "path": "",
+      "match": "regex",
+      "backend": {
+        "params": {
+          "php_admin_values": "open_basedir = none;",
+          "php_flags": "",
+          "pm": "dynamic"
+        },
+        "type": "php-fcgi"
+      }
+    }
+  ],
+  "custom_conf": "",
+  "ssl_key_path": "/etc/ajenti/certs/default_key.pem",
+  "owner": "root",
+  "ssl_cert_path": "/etc/ajenti/certs/default_cert.pem",
+  "custom_conf_toplevel": "",
+  "name": "default",
+  "enabled": true,
+  "extensions": {
+    "ajenti.plugins.vh.processes.ProcessesExtension": {
+      "processes": []
+    },
+    "ajenti.plugins.vh-mysql.mysql.MySQLExtension": {
+      "users": [],
+      "databases": []
+    }
+  },
+  "domains": [],
+  "root": "/srv/default",
+  "ports": [
+    {
+      "spdy": false,
+      "ssl": false,
+      "host": "*",
+      "port": 80,
+      "default": false
+    },
+    {
+      "spdy": true,
+      "ssl": true,
+      "host": "*",
+      "port": 443,
+      "default": false
+    }
+  ]
+}
