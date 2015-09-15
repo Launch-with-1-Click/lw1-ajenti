@@ -100,14 +100,6 @@ service "ajenti" do
   action [:start, :enable]
 end
 
-bash "import phpadmin to website" do
-  code <<-EOH
-    sleep 5
-    /usr/bin/ajenti-ipc v import /opt/lw1/tasks/site_phpmyadmin.json
-    /usr/bin/ajenti-ipc v apply
-  EOH
-end
-
 service "php5-fpm" do
   action :restart
 end
@@ -118,6 +110,15 @@ end
 
 cron "setup_ajenti_on_init" do
   action :delete
+end
+
+bash "import phpadmin to website" do
+  timeout 300
+  code <<-EOH
+    until test -S /var/run/ajenti-ipc.sock ; do sleep 3 ; done
+    /usr/bin/ajenti-ipc v import /opt/lw1/tasks/site_phpmyadmin.json
+    /usr/bin/ajenti-ipc v apply
+  EOH
 end
 
 %w{/var/chef/cache /var/chef/backup}.map do |dir|
