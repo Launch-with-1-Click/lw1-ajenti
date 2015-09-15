@@ -83,6 +83,11 @@ template "/opt/lw1/tasks/site_phpmyadmin.json" do
   source "/opt/lw1/tasks/site_phpmyadmin.json.erb"
 end
 
+template "/etc/php5/fpm/php-fpm.conf" do
+  local true
+  source "/opt/lw1/tasks/php-fpm.conf.erb"
+end
+
 file '/etc/ajenti/vh.json' do
   owner "root"
   group "root"
@@ -97,9 +102,14 @@ end
 
 bash "import phpadmin to website" do
   code <<-EOH
+    sleep 5
     /usr/bin/ajenti-ipc v import /opt/lw1/tasks/site_phpmyadmin.json
     /usr/bin/ajenti-ipc v apply
   EOH
+end
+
+service "php5-fpm" do
+  action :restart
 end
 
 service "nginx" do

@@ -1,4 +1,4 @@
-default[:lw1_agenti][:bonus][:phpmyadmin][:version] = '4.4.14'
-default[:lw1_agenti][:bonus][:phpmyadmin][:download_url] = 'https://files.phpmyadmin.net/phpMyAdmin/4.4.14/phpMyAdmin-4.4.14-all-languages.tar.gz'
-default[:lw1_agenti][:bonus][:phpmyadmin][:checksum] = '24285be74449cecd2bcdd8bb33840e800970b93a361176557c266222d753ad62'
+default[:lw1_agenti][:bonus][:phpmyadmin][:version] = '4.4.14.1'
+default[:lw1_agenti][:bonus][:phpmyadmin][:download_url] = 'https://files.phpmyadmin.net/phpMyAdmin/4.4.14.1/phpMyAdmin-4.4.14.1-all-languages.tar.xz'
+default[:lw1_agenti][:bonus][:phpmyadmin][:checksum] = '9425a90111078e9cf7bb5a7f0d70e748167649318d49b22752a2c7e795665510'
 

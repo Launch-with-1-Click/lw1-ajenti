@@ -5,8 +5,12 @@ directory "/opt/lw1/tasks" do
   recursive true
 end
 
-cookbook_file "/opt/lw1/tasks/vh.json.erb" do
-  source "ajenti/vh.json.erb"
+cookbook_file "/opt/lw1/tasks/site_phpmyadmin.json.erb" do
+  source "ajenti/site_phpmyadmin.json.erb"
+end
+
+cookbook_file "/opt/lw1/tasks/php-fpm.conf.erb" do
+  source "php5/php-fpm.conf.erb"
 end
 
 template "/opt/lw1/tasks/first_boot.rb" do
