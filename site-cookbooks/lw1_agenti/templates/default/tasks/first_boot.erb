@@ -100,14 +100,6 @@ service "ajenti" do
   action [:start, :enable]
 end
 
-service "php5-fpm" do
-  action :restart
-end
-
-service "nginx" do
-  action :restart
-end
-
 cron "setup_ajenti_on_init" do
   action :delete
 end
@@ -119,6 +111,14 @@ bash "import phpadmin to website" do
     /usr/bin/ajenti-ipc v import /opt/lw1/tasks/site_phpmyadmin.json
     /usr/bin/ajenti-ipc v apply
   EOH
+end
+
+service "php5-fpm" do
+  action :restart
+end
+
+service "nginx" do
+  action :restart
 end
 
 %w{/var/chef/cache /var/chef/backup}.map do |dir|

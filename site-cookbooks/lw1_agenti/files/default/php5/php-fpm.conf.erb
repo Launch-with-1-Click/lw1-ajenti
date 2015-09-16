@@ -17,3 +17,19 @@ pm.max_children = 5
 pm.min_spare_servers = 1
 pm.max_spare_servers = 5
 
+[default-php-fcgi-0]
+user = www-data
+group = www-data
+
+listen = /var/run/ajenti-v-php-fcgi-default-php-fcgi-0.sock
+listen.owner = www-data
+listen.group = www-data
+listen.mode = 0660
+
+pm = dynamic
+pm.max_children = 5
+pm.start_servers = 1
+pm.min_spare_servers = 1
+pm.max_spare_servers = 5
+
+php_admin_value[open_basedir] = none
