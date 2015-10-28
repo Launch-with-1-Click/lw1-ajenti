@@ -23,3 +23,19 @@ directory "/etc/ajenti/certs" do
   group "root"
   mode  "0755"
 end
+
+## Tempolary SSLv3 disable.
+cookbook_file '/etc/courier/imapd-ssl' do
+  source 'imapd-ssl'
+end
+
+## Ajenti Core patch
+cookbook_file '/usr/share/pyshared/ajenti/core.py' do
+  source 'ajenti/core.py'
+  only_if {
+    require 'specinfra'
+    Object.include Chef::Mixin::ShellOut
+    shell_out(Specinfra::Command::Debian::Base::Package.get_version('ajenti')).stdout == "1.2.23.0"
+  }
+end
+

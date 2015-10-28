@@ -33,6 +33,13 @@ file "/var/lib/ajenti/installation-uid" do
   action :delete
 end
 
+# expelimental...
+bash "delete pycs" do
+  code <<-EOH
+    find /var/lib/ajenti/plugins/ -name "*.pyc" -delete
+  EOH
+end
+
 cron "setup_ajenti_on_init" do
   action :create
   time :reboot

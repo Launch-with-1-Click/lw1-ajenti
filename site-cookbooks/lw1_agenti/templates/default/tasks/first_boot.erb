@@ -97,29 +97,44 @@ file '/etc/ajenti/vh.json' do
 end
 
 service "ajenti" do
-  action [:start, :enable]
+  action :enable
 end
 
 cron "setup_ajenti_on_init" do
   action :delete
 end
 
+### expelimental combination X ...
+#execute 'reboot' do
+#  action :nothing
+#  command "reboot &"
+#end
+
 bash "import phpadmin to website" do
   timeout 300
+  environment 'PATH' => "/sbin:/usr/sbin:/bin:/usr/bin"
   code <<-EOH
+    service ajenti start
     until test -S /var/run/ajenti-ipc.sock ; do sleep 3 ; done
+    until curl -s -k https://127.0.0.1:8443 ; do sleep 3 ; done
     /usr/bin/ajenti-ipc v import /opt/lw1/tasks/site_phpmyadmin.json
     /usr/bin/ajenti-ipc v apply
+    service ajenti restart
   EOH
+### expelimental combination X ...
+    # notifies :run, "execute[reboot]"
 end
 
-service "php5-fpm" do
-  action :restart
-end
-
-service "nginx" do
-  action :restart
-end
+## expelimental: check php-fpm loaded by ajenti
+## python -m compileall /var/lib/ajenti/plugins/
+# bash "wait nginx testmodule" do
+#   environment 'PATH' => "/sbin:/usr/sbin:/bin:/usr/bin"
+#   code <<-EOH
+#   until test -f /var/lib/ajenti/plugins/vh-php-fpm/phpfpm.pyc ; do
+#     service ajenti restart
+#   done
+#   EOH
+# end
 
 %w{/var/chef/cache /var/chef/backup}.map do |dir|
   directory dir do
