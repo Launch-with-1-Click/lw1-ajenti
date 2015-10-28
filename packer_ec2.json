@@ -14,7 +14,7 @@
       "ssh_username": "ubuntu",
       "ssh_timeout": "10m",
       "ssh_pty" : true,
-      "ami_name": "Ajenti 1.2.22.24 and Agenti-V 0.2.52 {{timestamp}}"
+      "ami_name": "Ajenti 1.2.30.0 and Agenti-V 0.2.53 {{timestamp}}"
     }
   ],
 
